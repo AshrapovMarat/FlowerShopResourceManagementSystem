@@ -41,7 +41,7 @@ namespace FlowerShopResourceManagementSystem
     {
       Name = name;
       Price = price;
-      Quantity = quantity;
+      QuantityInStock += quantity;
     }
     #endregion
   }
