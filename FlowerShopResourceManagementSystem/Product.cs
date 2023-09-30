@@ -37,11 +37,11 @@ namespace FlowerShopResourceManagementSystem
     #endregion
 
     #region Конструктор
-    public Product(string name, double price, int quantity) 
+    public Product(string name, double price, int quantityInStock, int TotalPurchasesCount = 0, int TotalSalesCount = 0) 
     {
-      Name = name;
-      Price = price;
-      QuantityInStock += quantity;
+      this.Name = name;
+      this.Price = price;
+      this.QuantityInStock += QuantityInStock;
     }
     #endregion
   }

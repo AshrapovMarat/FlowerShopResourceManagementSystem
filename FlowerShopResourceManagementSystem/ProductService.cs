@@ -11,8 +11,8 @@ namespace FlowerShopResourceManagementSystem
     List<Product> products = new List<Product>();
 
     #region Конструктор
-    public ProductService(List<Product> products) 
-    { 
+    public ProductService(List<Product> products)
+    {
       this.products = products;
     }
     #endregion
@@ -21,6 +21,10 @@ namespace FlowerShopResourceManagementSystem
     public void AddProducts(Product product)
     {
       products.Add(product);
+    }
+    public void AddProducts(string name, double price, int quantity)
+    {
+      products.Add(new Product(name, price, quantity));
     }
 
     //public void AddProducts(List<Product> products)
@@ -135,3 +139,5 @@ namespace FlowerShopResourceManagementSystem
 
   }
 }
+
+
