@@ -9,110 +9,156 @@ using System.Xml.Linq;
 
 namespace FlowerShopResourceManagementSystem
 {
+  /// <summary>
+  /// Класс реализует функционал для работы в консоли.
+  /// </summary>
   internal class ConsoleProgram
   {
+    /// <summary>
+    /// Метод, который запускает начало работы программы.
+    /// </summary>
     public void StartProgram()
     {
-      FileConnector connector = new FileConnector("");
+      FileConnector connector = new FileConnector();
       ProductService productService = new ProductService(connector.GetProductsFromFile());
       string name, newName;
       double price, newPrice;
       int quantity;
       while (true)
       {
+        Console.Clear();
         Console.WriteLine("Напишите какие действия вы хотите сделать:\n1. Вывести весь список продуктов.\n2. Добавить товар.\n3. Изменить цену товара.\n4. Изменить название товара.\n" +
-          "5. Изменить цену товара.\n6. Увеличить количество товара.\n7. Уменьшить количество товара.\n8. Удалить товар.");
+          "5. Увеличить количество товара.\n6. Уменьшить количество товара.\n7. Удалить товар.\n8. Создать отчет.");
         var key = Console.ReadKey(true).Key;
         Console.Clear();
         switch (key)
         {
           // Вывести весь список продуктов.
           case ConsoleKey.D1:
-            ProductListOutput(productService.GetProducts());
+            Console.WriteLine(productService.ProductListOutput(productService.GetProducts()));
+            Console.WriteLine("Для продолжения нажмите любую клавишу.");
+            Console.ReadKey();
             break;
 
           // Добавить товар.
           case ConsoleKey.D2:
-            name = ReadName();
-            price = ReadPrice();
-            quantity = ReadQuantity();
-            productService.AddProducts(name, price, quantity);
+            try
+            {
+              name = ReadName("Введите название товара, которого хотите добавить: ");
+              price = ReadPrice("Введите цену товара, которого хотите добавить: ");
+              quantity = ReadQuantity("Введите количество товара, которого хотите добавить: ");
+              productService.AddProducts(name, price, quantity);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey();
+              continue;
+            }
             connector.SaveProduct(productService.GetProducts());
             break;
 
           // Изменить цену товара.
           case ConsoleKey.D3:
-            name = ReadName();
-            price = ReadPrice("Введите новую цену товара: ");
-            productService.ChangeProductPrice(name, price);
+            try
+            {
+              name = ReadName("Введите название товара, цену которого хотите ихменить: ");
+              price = ReadPrice("Введите новую цену товара: ");
+              productService.ChangeProductPrice(name, price);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey(); 
+              continue;
+            }
+            connector.SaveProduct(productService.GetProducts());
             break;
 
           // Изменить название товара.
           case ConsoleKey.D4:
-            name = ReadName();
-            newName = ReadName("Введите новое название товара: ");
-            productService.ChangeProductName(name, newName);
-            break;
-
-          // Изменить цену товара.
-          case ConsoleKey.D5:
-            name = ReadName();
-            newPrice = ReadPrice("Введите новую цену товара");
-            productService.ChangeProductPrice(name, newPrice);
+            try
+            {
+              name = ReadName("Введите название товара, у которого хотите изменить название: ");
+              newName = ReadName("Введите новое название товара: ");
+              productService.ChangeProductName(name, newName);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey();
+              continue;
+            }
+            connector.SaveProduct(productService.GetProducts());
             break;
 
           // Увеличить количество товара.
-          case ConsoleKey.D6:
-            name = ReadName();
-            quantity = ReadQuantity();
-            productService.IncreaseTheNumberOfProducts(name, quantity);
+          case ConsoleKey.D5:
+            try
+            {
+              name = ReadName("Введите название товара, у которого хотите увеличить количество товара: ");
+              quantity = ReadQuantity("Введиет на сколько хотите увеличить количество товара: ");
+              productService.IncreaseTheNumberOfProducts(name, quantity);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey();
+              continue;
+            }
+            connector.SaveProduct(productService.GetProducts());
             break;
 
           // Уменьшить количество товара.
-          case ConsoleKey.D7:
-            name = ReadName();
-            quantity = ReadQuantity();
-            productService.ReduceTheNumberOfProducts(name, quantity);
+          case ConsoleKey.D6:
+            try
+            {
+              name = ReadName("Введите название товара, у которого хотите уменьшить количество товара: ");
+              quantity = ReadQuantity("Введиет на сколько хотите уменьшить количество товара: ");
+              productService.ReduceTheNumberOfProducts(name, quantity);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey();
+              continue;
+            }
+            connector.SaveProduct(productService.GetProducts());
             break;
 
           // Удалить товар.
+          case ConsoleKey.D7:
+            try
+            {
+              name = ReadName("Напишите название товара, которого хотите удалить: ");
+              productService.DeleteProduct(name);
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+              Console.ReadKey();
+              continue;
+            }
+            connector.SaveProduct(productService.GetProducts());
+            break;
+
+          // Создать отчет.
           case ConsoleKey.D8:
-            name = ReadName();
-            productService.DeleteProduct(name);
+            Report report = new Report(productService);
+            report.CreatReport("");
+            connector.SaveProduct(productService.GetProducts());
             break;
         }
       }
     }
 
-    /// <summary>
-    /// Вывод списка товаров.
-    /// </summary>
-    /// <param name="products">Список товаров.</param>
-    void ProductListOutput(List<Product> products)
-    {
-      int maxLengthName = 0;
-      int maxLengthPrice = 0;
-      int maxLengthQuantity = 0;
-      foreach (var product in products)
-      {
-        if (product.Name.Length > maxLengthName)
-        {
-          maxLengthName = product.Name.Length;
-        }
-        if (product.Price.ToString().Length > maxLengthPrice)
-        {
-          maxLengthPrice = product.Price.ToString().Length;
-        }
-        if (product.QuantityInStock.ToString().Length > maxLengthQuantity)
-        {
-          maxLengthQuantity = product.QuantityInStock.ToString().Length;
-        }
-      }
-      foreach (var product in products)
-      {
-        //Console.WriteLine(string.Format($"|{product.Name, maxLengthName}|{2,3}|{4,5}", product.Name, maxLengthName - 1, product.Price, -maxLengthPrice - 1, product.QuantityInStock, -maxLengthQuantity - 1));
-      }
-    }
+
 
     /// <summary>
     /// Прочитать с консоли название товара.
@@ -120,7 +166,7 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="textMessage">Вывод сообщение, что надо ввести.</param>
     /// <returns>Возращает имя товара введеное с консоли.</returns>
     /// <exception cref="FormatException">Возникает когда пользователь ввел пустую строку.</exception>
-    string ReadName(string textMessage = "Введите название товара: ")
+    string ReadName(string textMessage)
     {
       Console.Write(textMessage);
       string name = Console.ReadLine();
@@ -160,6 +206,7 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="textMessage">Вывод сообщение, что надо ввести.</param>
     /// <returns>Возращает количество товара введеное с консоли.</returns>
     /// <exception cref="FormatException">Возникает когда пользователь вел не корректное число.</exception>
+    
     int ReadQuantity(string textMessage = "Введите количество товара: ")
     {
       Console.Write(textMessage);

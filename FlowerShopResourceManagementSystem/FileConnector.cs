@@ -12,18 +12,17 @@ using System.Threading.Tasks;
 
 namespace FlowerShopResourceManagementSystem
 {
+  /// <summary>
+  /// Класс для получение и записованием данных в файл.
+  /// </summary>
   internal class FileConnector
   {
-    public string Path { get; set; }
-
-    public FileConnector(string path)
-    {
-      Path = path;
-    }
-
-
     public List<Product> GetProductsFromFile()
     {
+      if (!File.Exists("Products.json")) {
+        File.Create("Products.json").Close();
+      }
+
       string json = File.ReadAllText("Products.json");
       if (json != "")
       {
@@ -35,11 +34,8 @@ namespace FlowerShopResourceManagementSystem
 
     public void SaveProduct(List<Product> products)
     {
-      using (FileStream fs = new FileStream("Products.json", FileMode.OpenOrCreate))
-      {
-        string json = JsonSerializer.Serialize(products, new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
-        File.WriteAllText("Products.json", json);
-      }
+      string json = JsonSerializer.Serialize(products, new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, WriteIndented = true });
+      File.WriteAllText("Products.json", json);
     }
   }
 }

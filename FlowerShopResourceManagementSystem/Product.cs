@@ -25,7 +25,7 @@ namespace FlowerShopResourceManagementSystem
     public int QuantityInStock { get; set; }
 
     /// <summary>
-    /// Общее количество купленных товаров.
+    /// Общее количество закупленных товаров.
     /// </summary>
     public int TotalPurchasesCount {  get; set; }
 
@@ -37,11 +37,13 @@ namespace FlowerShopResourceManagementSystem
     #endregion
 
     #region Конструктор
-    public Product(string name, double price, int quantityInStock, int TotalPurchasesCount = 0, int TotalSalesCount = 0) 
+    public Product(string name, double price, int quantityInStock, int totalPurchasesCount = 0, int totalSalesCount = 0) 
     {
       this.Name = name;
       this.Price = price;
-      this.QuantityInStock += QuantityInStock;
+      this.QuantityInStock = quantityInStock;
+      this.TotalPurchasesCount += quantityInStock;
+      this.TotalSalesCount = totalSalesCount;
     }
     #endregion
   }
