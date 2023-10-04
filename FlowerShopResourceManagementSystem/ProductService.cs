@@ -45,7 +45,16 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="quantity">Количество товара.</param>
     public void AddProducts(string name, double price, int quantity)
     {
-      products.Add(new Product(name, price, quantity));
+      var indexElemant = products.FindIndex(p => p.Name == name);
+      if (indexElemant >= 0)
+      {
+        throw new InvalidOperationException("Товар с таким названием уже существует.");
+      }
+      else
+      {
+        products.Add(new Product(name, price, quantity));
+      }
+
     }
 
     #endregion
@@ -131,7 +140,10 @@ namespace FlowerShopResourceManagementSystem
     #endregion
 
     #region Удаление товара
-
+    /// <summary>
+    /// Удалить товар.
+    /// </summary>
+    /// <param name="nameProduct">Название товара.</param>
     public void DeleteProduct(string nameProduct)
     {
       var product = GetProduct(nameProduct);
@@ -141,12 +153,18 @@ namespace FlowerShopResourceManagementSystem
 
     #region Работа с БД
 
+    /// <summary>
+    /// Сохранить данные в файл.
+    /// </summary>
     public void SaveData()
     {
       FileConnector fileConnector = new FileConnector();
       fileConnector.SaveProduct(products);
     }
 
+    /// <summary>
+    /// Получить данные из файла.
+    /// </summary>
     public void GetData()
     {
       FileConnector fileConnector = new FileConnector();
@@ -156,7 +174,12 @@ namespace FlowerShopResourceManagementSystem
     #endregion
 
     #region Вывод информации о товаре
-    public string ProductListOutput(List<Product> products, string message = "")
+    /// <summary>
+    /// Получить таблицу со списком продуктов.
+    /// </summary>
+    /// <param name="products">Список продуктов.</param>
+    /// <returns>Таблица со списком продуктов.</returns>
+    public string GetProductList(List<Product> products)
     {
       int maxLengthName = 15; // Максимальное количество символов в столбце вместе с наименованием столбца
       int maxLengthPrice = 11; // Максимальное количество символов в столбце вместе с наименованием столбца
@@ -188,23 +211,14 @@ namespace FlowerShopResourceManagementSystem
         }
       }
 
-      //Console.WriteLine($"Предварительный просмотр о всех товаров на складе отсортированных по полю {message}:");
-      //Console.WriteLine($"{"Название товара".PadRight(maxLengthName)} | {"Цена товара".PadRight(maxLengthPrice)} | {"Количество товара".PadRight(maxLengthPrice)} | {"Количество закупленых товаров".PadRight(maxLengthTotalPurchasesCount)} | {"Количество проданых товаров".PadRight(maxLengthTotalSalesCount)}");
-      //Console.WriteLine($"{new string('-', maxLengthName)}-|-{new string('-', maxLengthPrice)}-|-{new string('-', maxLengthQuantity)}-|-{new string('-', maxLengthTotalPurchasesCount)}-|-{new string('-', maxLengthTotalSalesCount)}");
-      //text += $"Вывод всех товаров на складе отсортированных по полю {message}:";
       text += $"{"Название товара".PadRight(maxLengthName)} | {"Цена товара".PadRight(maxLengthPrice)} | {"Количество товара".PadRight(maxLengthPrice)} | {"Количество закупленых товаров".PadRight(maxLengthTotalPurchasesCount)} | {"Количество проданых товаров".PadRight(maxLengthTotalSalesCount)}";
       text += $"\n{new string('-', maxLengthName)}-|-{new string('-', maxLengthPrice)}-|-{new string('-', maxLengthQuantity)}-|-{new string('-', maxLengthTotalPurchasesCount)}-|-{new string('-', maxLengthTotalSalesCount)}";
 
-
       foreach (var product in products)
       {
-        //Console.WriteLine($"{product.Name.PadRight(maxLengthName)} | {product.Price.ToString().PadRight(maxLengthPrice)} | {product.QuantityInStock.ToString().PadRight(maxLengthQuantity)} | {product.TotalPurchasesCount.ToString().PadRight(maxLengthTotalPurchasesCount)} | {product.TotalSalesCount.ToString().PadRight(maxLengthTotalSalesCount)}");
         text += $"\n{product.Name.PadRight(maxLengthName)} | {product.Price.ToString().PadRight(maxLengthPrice)} | {product.QuantityInStock.ToString().PadRight(maxLengthQuantity)} | {product.TotalPurchasesCount.ToString().PadRight(maxLengthTotalPurchasesCount)} | {product.TotalSalesCount.ToString().PadRight(maxLengthTotalSalesCount)}";
       }
       return text;
-      //Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-      //Console.ReadKey();
-
     }
     #endregion
   }

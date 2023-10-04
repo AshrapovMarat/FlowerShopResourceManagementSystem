@@ -12,3 +12,6 @@ C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopRe
 C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\obj\Debug\net6.0\FlowerShopResourceManagementSystem.pdb
 C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\obj\Debug\net6.0\FlowerShopResourceManagementSystem.genruntimeconfig.cache
 C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\obj\Debug\net6.0\ref\FlowerShopResourceManagementSystem.dll
+C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\bin\Debug\net6.0\nunit.framework.dll
+C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\obj\Debug\net6.0\FlowerShopResourceManagementSystem.csproj.AssemblyReference.cache
+C:\Users\Марат\source\repos\FlowerShopResourceManagementSystem\FlowerShopResourceManagementSystem\obj\Debug\net6.0\FlowerShopResourceManagementSystem.csproj.CopyComplete

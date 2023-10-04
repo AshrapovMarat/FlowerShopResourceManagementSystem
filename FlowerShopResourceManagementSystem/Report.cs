@@ -14,11 +14,20 @@ namespace FlowerShopResourceManagementSystem
   internal class Report
   {
     ProductService productService;
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="productService"></param>
     public Report(ProductService productService)
     {
       this.productService = productService;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pathSaveFile"></param>
+    /// <param name="nameFieldSort"></param>
     public void CreatReport(string pathSaveFile, string nameFieldSort = "Без сортировки")
     {
       string json = File.ReadAllText("Products.json");
@@ -54,31 +63,31 @@ namespace FlowerShopResourceManagementSystem
         case ConsoleKey.D1:
           products.Sort((x, y) => x.Name.CompareTo(y.Name));
           Console.WriteLine("Список отсортирован по имени.");
-          Console.WriteLine(productService.ProductListOutput(products, "Name"));
+          Console.WriteLine(productService.GetProductList(products));
           //productService.ProductListOutput(products, "Name");
           break;
         case ConsoleKey.D2:
           products.Sort((x, y) => x.Price.CompareTo(y.Price));
           Console.WriteLine("Список отсортирован по цене.");
-          Console.WriteLine(productService.ProductListOutput(products, "Price"));
+          Console.WriteLine(productService.GetProductList(products));
           //productService.ProductListOutput(products, "Price");
           break;
         case ConsoleKey.D3:
           products.Sort((x, y) => x.QuantityInStock.CompareTo(y.QuantityInStock));
           Console.WriteLine("Список отсортирован по количеству товаров на складе.");
-          Console.WriteLine(productService.ProductListOutput(products, "QuantityInStock"));
+          Console.WriteLine(productService.GetProductList(products));
           //productService.ProductListOutput(products, "QuantityInStock");
           break;
         case ConsoleKey.D4:
           products.Sort((x, y) => x.TotalPurchasesCount.CompareTo(y.TotalPurchasesCount));
           Console.WriteLine("Список отсортирован по закупленым товарам.");
-          Console.WriteLine(productService.ProductListOutput(products, "TotalPurchasesCount"));
+          Console.WriteLine(productService.GetProductList(products));
           //productService.ProductListOutput(products, "TotalPurchasesCount");
           break;
         case ConsoleKey.D5:
           products.Sort((x, y) => x.TotalSalesCount.CompareTo(y.TotalSalesCount));
           Console.WriteLine("Список отсортирован по проданым товаром.");
-          Console.WriteLine(productService.ProductListOutput(products, "TotalSalesCount"));
+          Console.WriteLine(productService.GetProductList(products));
           break;
       }
     }
@@ -93,7 +102,7 @@ namespace FlowerShopResourceManagementSystem
       {
         File.Create(path).Close();
       }
-      File.WriteAllText(path, productService.ProductListOutput(products));
+      File.WriteAllText(path, productService.GetProductList(products));
     }
   }
 }

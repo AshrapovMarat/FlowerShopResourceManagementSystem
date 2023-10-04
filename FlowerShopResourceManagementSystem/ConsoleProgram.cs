@@ -35,7 +35,7 @@ namespace FlowerShopResourceManagementSystem
         {
           // Вывести весь список продуктов.
           case ConsoleKey.D1:
-            Console.WriteLine(productService.ProductListOutput(productService.GetProducts()));
+            Console.WriteLine(productService.GetProductList(productService.GetProducts()));
             Console.WriteLine("Для продолжения нажмите любую клавишу.");
             Console.ReadKey();
             break;
