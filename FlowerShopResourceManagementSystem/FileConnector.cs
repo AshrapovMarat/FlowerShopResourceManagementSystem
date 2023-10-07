@@ -15,27 +15,41 @@ namespace FlowerShopResourceManagementSystem
   /// <summary>
   /// Класс для получение и записованием данных в файл.
   /// </summary>
-  internal class FileConnector
+  internal static class FileConnector
   {
-    public List<Product> GetProductsFromFile()
+    public static List<Product> GetProducts()
     {
-      if (!File.Exists("Products.json")) {
-        File.Create("Products.json").Close();
-      }
-
-      string json = File.ReadAllText("Products.json");
-      if (json != "")
+      using (ApplicationContext db = new ApplicationContext())
       {
-        return JsonSerializer.Deserialize<List<Product>>(json);
+        return db.Products.ToList();
       }
-
-      return new List<Product>();
     }
 
-    public void SaveProduct(List<Product> products)
+    public static void Add(Product product)
     {
-      string json = JsonSerializer.Serialize(products, new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, WriteIndented = true });
-      File.WriteAllText("Products.json", json);
+      using (ApplicationContext db = new ApplicationContext())
+      {
+        db.Products.Add(product);
+        db.SaveChanges();
+      }
+    }
+
+    public static void Update(Product product)
+    {
+      using (ApplicationContext db = new ApplicationContext())
+      {
+        db.Products.Update(product);
+        db.SaveChanges();
+      }
+    }
+
+    public static void Delete(Product product)
+    {
+      using (ApplicationContext db = new ApplicationContext())
+      {
+        db.Products.Remove(product);
+        db.SaveChanges();
+      }
     }
   }
 }

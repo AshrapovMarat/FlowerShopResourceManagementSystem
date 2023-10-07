@@ -31,7 +31,7 @@ namespace FlowerShopResourceManagementSystem
     public void CreatReport(string pathSaveFile, string nameFieldSort = "Без сортировки")
     {
       string json = File.ReadAllText("Products.json");
-      List<Product> products = JsonSerializer.Deserialize<List<Product>>(json);
+      List<Product> products = FileConnector.GetProducts();
       SortReport(products);
       Console.WriteLine("Выберите действие которое хотите выполнить: \n1. Создать отчет.\n2. Поменять сортировку в отчете.\n3. Выйти в главное окно.\n");
       var key = Console.ReadKey(true).Key;
@@ -96,7 +96,7 @@ namespace FlowerShopResourceManagementSystem
     {
       if(!Directory.Exists(Path.GetDirectoryName(path))) 
       {
-        throw new DirectoryNotFoundException();
+        throw new DirectoryNotFoundException("Каталог не найден.");
       }
       if (File.Exists(Path.GetFileName(path))) 
       {

@@ -19,8 +19,7 @@ namespace FlowerShopResourceManagementSystem
     /// </summary>
     public void StartProgram()
     {
-      FileConnector connector = new FileConnector();
-      ProductService productService = new ProductService(connector.GetProductsFromFile());
+      ProductService productService = new ProductService(FileConnector.GetProducts());
       string name, newName;
       double price, newPrice;
       int quantity;
@@ -47,7 +46,7 @@ namespace FlowerShopResourceManagementSystem
               name = ReadName("Введите название товара, которого хотите добавить: ");
               price = ReadPrice("Введите цену товара, которого хотите добавить: ");
               quantity = ReadQuantity("Введите количество товара, которого хотите добавить: ");
-              productService.AddProducts(name, price, quantity);
+              productService.AddProduct(name, price, quantity);
             }
             catch (Exception ex)
             {
@@ -56,7 +55,7 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey();
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Изменить цену товара.
@@ -74,7 +73,7 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey(); 
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Изменить название товара.
@@ -92,7 +91,7 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey();
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Увеличить количество товара.
@@ -110,7 +109,7 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey();
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Уменьшить количество товара.
@@ -128,7 +127,7 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey();
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Удалить товар.
@@ -145,20 +144,18 @@ namespace FlowerShopResourceManagementSystem
               Console.ReadKey();
               continue;
             }
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
 
           // Создать отчет.
           case ConsoleKey.D8:
             Report report = new Report(productService);
             report.CreatReport("");
-            connector.SaveProduct(productService.GetProducts());
+            //FileConnector.SaveProduct(productService.GetProducts());
             break;
         }
       }
     }
-
-
 
     /// <summary>
     /// Прочитать с консоли название товара.
@@ -169,8 +166,8 @@ namespace FlowerShopResourceManagementSystem
     string ReadName(string textMessage)
     {
       Console.Write(textMessage);
-      string name = Console.ReadLine();
-      if (name != null)
+      string name = Console.ReadLine().Trim();
+      if (name != "")
       {
         return name;
       }
@@ -189,8 +186,7 @@ namespace FlowerShopResourceManagementSystem
     double ReadPrice(string textMessage = "Введите цену товара: ")
     {
       Console.Write(textMessage);
-      double price = Convert.ToDouble(Console.ReadLine());
-      if (!(price.ToString().Split('.', ',').Length > 2))
+      if (double.TryParse(Console.ReadLine(), out double price) && !(price.ToString().Split(',').Length > 2))
       {
         return price;
       }
@@ -206,19 +202,17 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="textMessage">Вывод сообщение, что надо ввести.</param>
     /// <returns>Возращает количество товара введеное с консоли.</returns>
     /// <exception cref="FormatException">Возникает когда пользователь вел не корректное число.</exception>
-    
+
     int ReadQuantity(string textMessage = "Введите количество товара: ")
     {
       Console.Write(textMessage);
-      //int quantity = Convert.ToInt32(Console.ReadLine().Count() == 0 ? throw new FormatException("Введена пустая строка.") : Console.ReadLine());
-      int quantity = Convert.ToInt32(Console.ReadLine());
-      if (quantity != null)
+      if (int.TryParse(Console.ReadLine(), out int quantity))
       {
         return quantity;
       }
       else
       {
-        throw new FormatException("Введена пустая строка.");
+        throw new FormatException("Введено не коректое число.");
       }
     }
   }
