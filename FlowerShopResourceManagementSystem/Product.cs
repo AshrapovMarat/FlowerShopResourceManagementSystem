@@ -9,7 +9,7 @@ namespace FlowerShopResourceManagementSystem
 {
   public class Product
   {
-    #region Свойства
+    #region Поля и свойства
     [Key]
     /// <summary>
     /// Название товара.
@@ -27,50 +27,44 @@ namespace FlowerShopResourceManagementSystem
     public int QuantityInStock { get; set; }
 
     /// <summary>
-    /// Общее количество закупленных товаров.
+    /// Количество всего купленых товаров.
     /// </summary>
     public int TotalPurchasesCount {  get; set; }
 
     /// <summary>
-    /// Общее количество проданных товаров.
+    /// Количество всего проданных товаров.
     /// </summary>
     public int TotalSalesCount { get; set; }
 
     /// <summary>
-    /// Общая стоимость купленых товаров.
+    /// Общая стоимость покупки товаров.
     /// </summary>
     public double TotalCostPurchased { get; set; }
 
     /// <summary>
-    /// Общая стоимость проданных товаров.
+    /// Общая стоимость продажи товаров.
     /// </summary>
     public double TotalSalesValue { get; set; }
 
     #endregion
 
     #region Конструктор
+
     /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="name">Название товара.</param>
     /// <param name="price">Цена товара.</param>
     /// <param name="quantityInStock">Количество товара.</param>
-    /// <param name="totalPurchasesCount">Общее количество закупленных товаров.</param>
-    /// <param name="totalSalesCount">Общее количество проданных товаров.</param>
-    /// <param name="totalCostPurchased">Общая стоимость купленных товаров.</param>
-    /// <param name="totalSalesValue">Общая стоимость проданных товаров.</param>
-    public Product(string name, double price, int quantityInStock, int totalPurchasesCount = 0, int totalSalesCount = 0, double totalCostPurchased = 0, double totalSalesValue = 0) 
+    public Product(string name, double price, int quantityInStock)
     {
       Name = name;
       Price = price;
       QuantityInStock = quantityInStock;
-      TotalPurchasesCount = totalPurchasesCount;
       TotalPurchasesCount += quantityInStock;
-      TotalSalesCount = totalSalesCount;
-      TotalCostPurchased = totalCostPurchased;
-      TotalCostPurchased += price * quantityInStock;
-      TotalSalesValue = totalSalesValue;
+      TotalCostPurchased += quantityInStock * price;
     }
+
     #endregion
   }
 }
