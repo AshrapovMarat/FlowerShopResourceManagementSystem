@@ -1,16 +1,1 @@
-[
-  {
-    "Name": "Лилия",
-    "Price": 32.53,
-    "QuantityInStock": 31,
-    "TotalPurchasesCount": 31,
-    "TotalSalesCount": 19
-  },
-  {
-    "Name": "Роза",
-    "Price": 54.12,
-    "QuantityInStock": 34,
-    "TotalPurchasesCount": 34,
-    "TotalSalesCount": 0
-  }
-]
+[]

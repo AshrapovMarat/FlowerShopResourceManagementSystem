@@ -1,41 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FlowerShopResourceManagementSystem
 {
-  internal class ProductService
+  /// <summary>
+  /// Класc для работы с объектами Product.
+  /// </summary>
+  public class ProductService
   {
-    /// <summary>
-    /// Товары.
-    /// </summary>
-    List<Product> products = new List<Product>();
-
-    #region Конструктор
-
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    /// <param name="products">Список товаров.</param>
-    public ProductService(List<Product> products)
-    {
-      this.products = products;
-    }
-
-    #endregion
-
-    #region Добавление товаров
-
-    /// <summary>
-    /// Добавить товар в список.
-    /// </summary>
-    /// <param name="product">Экземпляр продукта.</param>
-    public void AddProducts(Product product)
-    {
-      products.Add(product);
-    }
+    #region Методы
 
     /// <summary>
     /// Добавить товар в список.
@@ -43,37 +20,44 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="name">Название товара.</param>
     /// <param name="price">Цена товара.</param>
     /// <param name="quantity">Количество товара.</param>
-    public void AddProducts(string name, double price, int quantity)
+    public void AddProduct(string name, double price, int quantity)
     {
-      products.Add(new Product(name, price, quantity));
+      List<Product> products = this.GetProducts();
+      var indexElemant = products.FindIndex(p => p.Name == name);
+      if (indexElemant >= 0)
+      {
+        throw new InvalidOperationException("Товар с таким названием уже существует.");
+      }
+      else
+      {
+        ConnectorDB.Add(new Product(name, price, quantity));
+      }
     }
-
-    #endregion
-
-    #region Получение товаров и информацию о товаре
 
     /// <summary>
     /// Получение всего списка товаров.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Все товары.</returns>
     public List<Product> GetProducts()
     {
-      return products;
+      return ConnectorDB.GetProducts();
     }
 
     /// <summary>
     /// Получение определенного товара.
     /// </summary>
     /// <param name="productName">Название товара.</param>
-    /// <returns></returns>
+    /// <returns>Экземпляр товара.</returns>
     public Product GetProduct(string productName)
     {
-      return products.Find(product => product.Name == productName);
+      List<Product> products = this.GetProducts();
+      Product product = products.Find(product => product.Name == productName);
+      if (product == null)
+      {
+        throw new NullReferenceException("Объект не найден");
+      }
+      return product;
     }
-
-    #endregion
-
-    #region Редактирование товара
 
     /// <summary>
     /// Изменить цену товара.
@@ -82,8 +66,9 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="newPrice">Новая цена товара.</param>
     public void ChangeProductPrice(string nameProduct, double newPrice)
     {
-      var product = GetProduct(nameProduct);
+      var product = this.GetProduct(nameProduct);
       product.Price = newPrice;
+      ConnectorDB.Update(product);
     }
 
     /// <summary>
@@ -93,30 +78,33 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="newNameProduct">Новое название товара.</param>
     public void ChangeProductName(string oldNameProduct, string newNameProduct)
     {
-      var product = GetProduct(oldNameProduct);
+      var product = this.GetProduct(oldNameProduct);
       product.Name = newNameProduct;
+      ConnectorDB.Update(product);
     }
 
     /// <summary>
     /// Увеличить количество товаров.
     /// </summary>
     /// <param name="nameProduct">Название товара.</param>
-    /// <param name="numberOfProducts">На сколько надо увеличить количество товара.</param>
+    /// <param name="numberOfProducts">Насколько надо увеличить количество товара.</param>
     public void IncreaseTheNumberOfProducts(string nameProduct, int numberOfProducts)
     {
-      var product = GetProduct(nameProduct);
+      var product = this.GetProduct(nameProduct);
       product.QuantityInStock += numberOfProducts;
       product.TotalPurchasesCount += numberOfProducts;
+      product.TotalCostPurchased += numberOfProducts * product.Price;
+      ConnectorDB.Update(product);
     }
 
     /// <summary>
     /// Уменьшить количество товаров.
     /// </summary>
     /// <param name="nameProduct">Название товара.</param>
-    /// <param name="numberOfProducts">На сколько надо уменьшить количество товара.</param>
+    /// <param name="numberOfProducts">Насколько надо уменьшить количество товара.</param>
     public void ReduceTheNumberOfProducts(string nameProduct, int numberOfProducts)
     {
-      var product = GetProduct(nameProduct);
+      var product = this.GetProduct(nameProduct);
       if ((product.QuantityInStock - numberOfProducts) < 0)
       {
         throw new ArgumentOutOfRangeException("Количество товаров не может быть отрицательное количество.");
@@ -125,44 +113,36 @@ namespace FlowerShopResourceManagementSystem
       {
         product.QuantityInStock -= numberOfProducts;
         product.TotalSalesCount += numberOfProducts;
+        product.TotalSalesValue += numberOfProducts * product.Price;
+        ConnectorDB.Update(product);
       }
     }
 
-    #endregion
-
-    #region Удаление товара
-
+    /// <summary>
+    /// Удалить товар.
+    /// </summary>
+    /// <param name="nameProduct">Название товара.</param>
     public void DeleteProduct(string nameProduct)
     {
-      var product = GetProduct(nameProduct);
-      products.Remove(product);
-    }
-    #endregion
-
-    #region Работа с БД
-
-    public void SaveData()
-    {
-      FileConnector fileConnector = new FileConnector();
-      fileConnector.SaveProduct(products);
+      var product = this.GetProduct(nameProduct);
+      ConnectorDB.Delete(product);
     }
 
-    public void GetData()
+    /// <summary>
+    /// Получить таблицу со списком продуктов.
+    /// </summary>
+    /// <param name="products">Список продуктов.</param>
+    /// <returns>Таблица со списком продуктов.</returns>
+    public string GetProductList(List<Product> products)
     {
-      FileConnector fileConnector = new FileConnector();
-      products = fileConnector.GetProductsFromFile();
-    }
+      int maxLengthName = 15; // Максимальная длина строки для наименования товара, учитывая длину названия столбца.
+      int maxLengthPrice = 11; // Максимальная длина строки для цены товара, учитывая длину названия столбца.
+      int maxLengthQuantity = 27; // Максимальная длина строки для количества товара на складе, учитывая длину названия столбца.
+      int maxLengthTotalPurchasesCount = 35; // Максимальная длина строки для количества всего купленных товаров, учитывая длину названия столбца.
+      int maxLengthTotalSalesCount = 33; // Максимальная длина строки для количества всего проданных товаров, учитывая длину названия столбца.
+      int maxLengthTotalCostPurchased = 31; // Максимальная длина строки для общей стоимости купленных товаров, учитывая длину названия столбца.
+      int maxLengthTotalSalesValue = 31; // Максимальная длина строки для общей стоимости продажи товаров, учитывая длину названия столбца.
 
-    #endregion
-
-    #region Вывод информации о товаре
-    public string ProductListOutput(List<Product> products, string message = "")
-    {
-      int maxLengthName = 15; // Максимальное количество символов в столбце вместе с наименованием столбца
-      int maxLengthPrice = 11; // Максимальное количество символов в столбце вместе с наименованием столбца
-      int maxLengthQuantity = 17; // Максимальное количество символов в столбце вместе с наименованием столбца
-      int maxLengthTotalPurchasesCount = 29; // Максимальное количество символов в столбце вместе с количеством закупленых товаров
-      int maxLengthTotalSalesCount = 27; // Максимальное количество символов в столбце вместе с наименованием столбца
       string text = string.Empty;
       foreach (var product in products)
       {
@@ -186,26 +166,48 @@ namespace FlowerShopResourceManagementSystem
         {
           maxLengthTotalSalesCount = product.TotalSalesCount.ToString().Length;
         }
+        if (product.TotalCostPurchased.ToString().Length > maxLengthTotalCostPurchased)
+        {
+          maxLengthTotalCostPurchased = product.TotalCostPurchased.ToString().Length;
+        }
+        if (product.TotalSalesValue.ToString().Length > maxLengthTotalSalesValue)
+        {
+          maxLengthTotalSalesValue = product.TotalSalesValue.ToString().Length;
+        }
       }
 
-      //Console.WriteLine($"Предварительный просмотр о всех товаров на складе отсортированных по полю {message}:");
-      //Console.WriteLine($"{"Название товара".PadRight(maxLengthName)} | {"Цена товара".PadRight(maxLengthPrice)} | {"Количество товара".PadRight(maxLengthPrice)} | {"Количество закупленых товаров".PadRight(maxLengthTotalPurchasesCount)} | {"Количество проданых товаров".PadRight(maxLengthTotalSalesCount)}");
-      //Console.WriteLine($"{new string('-', maxLengthName)}-|-{new string('-', maxLengthPrice)}-|-{new string('-', maxLengthQuantity)}-|-{new string('-', maxLengthTotalPurchasesCount)}-|-{new string('-', maxLengthTotalSalesCount)}");
-      //text += $"Вывод всех товаров на складе отсортированных по полю {message}:";
-      text += $"{"Название товара".PadRight(maxLengthName)} | {"Цена товара".PadRight(maxLengthPrice)} | {"Количество товара".PadRight(maxLengthPrice)} | {"Количество закупленых товаров".PadRight(maxLengthTotalPurchasesCount)} | {"Количество проданых товаров".PadRight(maxLengthTotalSalesCount)}";
-      text += $"\n{new string('-', maxLengthName)}-|-{new string('-', maxLengthPrice)}-|-{new string('-', maxLengthQuantity)}-|-{new string('-', maxLengthTotalPurchasesCount)}-|-{new string('-', maxLengthTotalSalesCount)}";
+      text += $"{"Название товара".PadRight(maxLengthName)} | {"Цена товара".PadRight(maxLengthPrice)} " +
+        $"| {"Количество товара на складе".PadRight(maxLengthPrice)} " +
+        $"| {"Количество всего купленых товаров".PadRight(maxLengthTotalPurchasesCount)} " +
+        $"| {"Количество всего проданых товаров".PadRight(maxLengthTotalSalesCount)} " +
+        $"| {"Общая стоимость покупки товаров".PadRight(maxLengthTotalCostPurchased)} " +
+        $"| {"Общая стоимость продажи товаров".PadRight(maxLengthTotalSalesValue)}";
 
+      text += $"\n{new string('-', maxLengthName)}-|-{new string('-', maxLengthPrice)}-" +
+        $"|-{new string('-', maxLengthQuantity)}-" +
+        $"|-{new string('-', maxLengthTotalPurchasesCount)}-|-{new string('-', maxLengthTotalSalesCount)}-" +
+        $"|-{new string('-', maxLengthTotalCostPurchased)}-" + $"|-{new string('-', maxLengthTotalSalesValue)}";
 
       foreach (var product in products)
       {
-        //Console.WriteLine($"{product.Name.PadRight(maxLengthName)} | {product.Price.ToString().PadRight(maxLengthPrice)} | {product.QuantityInStock.ToString().PadRight(maxLengthQuantity)} | {product.TotalPurchasesCount.ToString().PadRight(maxLengthTotalPurchasesCount)} | {product.TotalSalesCount.ToString().PadRight(maxLengthTotalSalesCount)}");
-        text += $"\n{product.Name.PadRight(maxLengthName)} | {product.Price.ToString().PadRight(maxLengthPrice)} | {product.QuantityInStock.ToString().PadRight(maxLengthQuantity)} | {product.TotalPurchasesCount.ToString().PadRight(maxLengthTotalPurchasesCount)} | {product.TotalSalesCount.ToString().PadRight(maxLengthTotalSalesCount)}";
+        text += $"\n{product.Name.PadRight(maxLengthName)} | {product.Price.ToString("0.00").PadRight(maxLengthPrice)} " +
+          $"| {product.QuantityInStock.ToString().PadRight(maxLengthQuantity)} " +
+          $"| {product.TotalPurchasesCount.ToString().PadRight(maxLengthTotalPurchasesCount)} " +
+          $"| {product.TotalSalesCount.ToString().PadRight(maxLengthTotalSalesCount)} " +
+          $"| {product.TotalCostPurchased.ToString("0.00").PadRight(maxLengthTotalCostPurchased)} " +
+          $"| {product.TotalSalesValue.ToString("0.00").PadRight(maxLengthTotalSalesValue)}";
       }
       return text;
-      //Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-      //Console.ReadKey();
-
     }
+    #endregion
+
+    #region Конструктор
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ProductService() { }
+
     #endregion
   }
 }
