@@ -4,7 +4,8 @@
   {
     static void Main(string[] args)
     {
-      ConsoleProgram consoleProgram = new ConsoleProgram();
+      var productService = new ProductService();
+      ConsoleProgram consoleProgram = ConsoleProgram.Initialize(productService);
       consoleProgram.StartProgram();
     }
   }

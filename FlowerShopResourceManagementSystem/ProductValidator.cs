@@ -9,7 +9,7 @@ namespace FlowerShopResourceManagementSystem
   /// <summary>
   /// Валидатор для товаров.
   /// </summary>
-  public static class ProductValidator
+  public static class ProductValidator 
   {
     #region Методы
 
@@ -38,11 +38,11 @@ namespace FlowerShopResourceManagementSystem
     /// <param name="inputPrice">Введеная цена.</param>
     /// <returns>Цена товара.</returns>
     /// <exception cref="FormatException">Возникает когда пользователь ввел некорректное число.</exception>
-    public static double ValidatePrice(string inputPrice)
+    public static double ValidatePrice(string inputPrice) 
     {
       if (double.TryParse(inputPrice.Trim(), out double price) && price >= 0)
       {
-        string[] priceSplit = price.ToString().Split(',');
+        var priceSplit = price.ToString().Split(',');
         if (priceSplit.Count() == 1)
         {
           return price;
@@ -75,6 +75,7 @@ namespace FlowerShopResourceManagementSystem
         throw new FormatException("Введено некоректое число.");
       }
     }
+
     #endregion
   }
 }
