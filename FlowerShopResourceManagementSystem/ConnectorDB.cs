@@ -17,7 +17,9 @@ namespace FlowerShopResourceManagementSystem
   /// </summary>
   internal static class ConnectorDB
   {
+
     #region Методы
+
     /// <summary>
     /// Получить все товары.
     /// </summary>
@@ -68,6 +70,8 @@ namespace FlowerShopResourceManagementSystem
         db.SaveChanges();
       }
     }
+
     #endregion
+
   }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -15,14 +16,40 @@ namespace FlowerShopResourceManagementSystem
   /// </summary>
   internal class ConsoleProgram
   {
+    #region Поля и свойства
+    /// <summary>
+    /// Экземпляр класса ConsoleProgram.
+    /// </summary>
+    private static ConsoleProgram consoleProgram = null;
+
+    /// <summary>
+    /// Экзмемпляр для работы с объектами Product.
+    /// </summary>
+    IProductService ProductService { get; set; }
+
+    #endregion
+
     #region Методы
+
+    /// <summary>
+    /// Метод для создания единичного экземпляра данного класса.
+    /// </summary>
+    /// <param name="productService">Экзмемпляр для работы с объектами Product.</param>
+    /// <returns>Экземпляр класса ConsoleProgram.</returns>
+    public static ConsoleProgram Initialize(IProductService productService)
+    {
+      if (consoleProgram == null)
+      {
+        consoleProgram = new ConsoleProgram(productService);
+      }
+      return consoleProgram;
+    }
 
     /// <summary>
     /// Метод, который запускает начало работы программы.
     /// </summary>
     public void StartProgram()
     {
-      ProductService productService = new ProductService();
       string name, newName;
       double price, newPrice;
       int quantity;
@@ -30,16 +57,26 @@ namespace FlowerShopResourceManagementSystem
       {
         Console.Clear();
         Console.WriteLine("Напишите какие действия вы хотите сделать:\n1. Вывести весь список продуктов.\n2. Добавить товар." +
-          "\n3. Изменить цену товара.\n4. Увеличить количество товара.\n5. Уменьшить количество товара.\n6. Удалить товар.\n7. Создать отчет.\n8. Выйти из программы.");
+          "\n3. Изменить цену товара.\n4. Увеличить количество товара.\n5. Уменьшить количество товара." +
+          "\n6. Удалить товар.\n7. Создать отчет.\n8. Выйти из программы.");
         var key = Console.ReadKey(true).Key;
         Console.Clear();
         switch (key)
         {
           // Вывести весь список продуктов.
           case ConsoleKey.D1:
-            Console.WriteLine(productService.GetProductList(productService.GetProducts()));
-            Console.WriteLine("Для продолжения нажмите любую клавишу.");
-            Console.ReadKey();
+            try
+            {
+              Console.WriteLine(this.ProductService.GetProductList(this.ProductService.GetProducts()));
+            }
+            catch(Exception ex) 
+            {
+              ErrorOutput(ex);
+            }
+            finally
+            {
+              WaitForUserInput();
+            }
             break;
 
           // Добавить товар.
@@ -49,18 +86,12 @@ namespace FlowerShopResourceManagementSystem
               name = this.ReadName("Введите название товара, который хотите добавить: ");
               price = this.ReadPrice("Введите цену товара, который хотите добавить: ");
               quantity = this.ReadQuantity("Введите количество товара, который хотите добавить: ");
-              productService.AddProduct(name, price, quantity);
-            }
-            catch (СreatingElementException ex)
-            {
-              continue;
+              this.ProductService.AddProduct(name, price, quantity);
             }
             catch (Exception ex)
             {
-              Console.WriteLine(ex.Message);
-              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-              Console.ReadKey();
-              continue;
+              ErrorOutput(ex);
+              WaitForUserInput();
             }
             break;
 
@@ -70,18 +101,12 @@ namespace FlowerShopResourceManagementSystem
             {
               name = this.ReadName("Введите название товара, цену которого хотите изменить: ");
               price = this.ReadPrice("Введите новую цену товара: ");
-              productService.ChangeProductPrice(name, price);
-            }
-            catch (СreatingElementException ex)
-            {
-              continue;
+              this.ProductService.ChangeProductPrice(name, price);
             }
             catch (Exception ex)
             {
-              Console.WriteLine(ex.Message);
-              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-              Console.ReadKey();
-              continue;
+              ErrorOutput(ex);
+              WaitForUserInput();
             }
             break;
 
@@ -90,19 +115,13 @@ namespace FlowerShopResourceManagementSystem
             try
             {
               name = this.ReadName("Введите название товара, у которого хотите увеличить количество: ");
-              quantity = this.ReadQuantity("Введиет на сколько хотите увеличить количество: ");
-              productService.IncreaseTheNumberOfProducts(name, quantity);
-            }
-            catch (СreatingElementException ex)
-            {
-              continue;
+              quantity = this.ReadQuantity("Введите на сколько хотите увеличить количество: ");
+              this.ProductService.IncreaseTheNumberOfProducts(name, quantity);
             }
             catch (Exception ex)
             {
-              Console.WriteLine(ex.Message);
-              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-              Console.ReadKey();
-              continue;
+              ErrorOutput(ex);
+              WaitForUserInput();
             }
             break;
 
@@ -111,19 +130,13 @@ namespace FlowerShopResourceManagementSystem
             try
             {
               name = this.ReadName("Введите название товара, у которого хотите уменьшить количество: ");
-              quantity = this.ReadQuantity("Введиет на сколько хотите уменьшить количество: ");
-              productService.ReduceTheNumberOfProducts(name, quantity);
-            }
-            catch (СreatingElementException ex)
-            {
-              continue;
+              quantity = this.ReadQuantity("Введите на сколько хотите уменьшить количество: ");
+              this.ProductService.ReduceTheNumberOfProducts(name, quantity);
             }
             catch (Exception ex)
             {
-              Console.WriteLine(ex.Message);
-              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-              Console.ReadKey();
-              continue;
+              ErrorOutput(ex);
+              WaitForUserInput();
             }
             break;
 
@@ -132,24 +145,18 @@ namespace FlowerShopResourceManagementSystem
             try
             {
               name = this.ReadName("Напишите название товара, который хотите удалить: ");
-              productService.DeleteProduct(name);
-            }
-            catch (СreatingElementException ex)
-            {
-              continue;
+              this.ProductService.DeleteProduct(name);
             }
             catch (Exception ex)
             {
-              Console.WriteLine(ex.Message);
-              Console.WriteLine("Для продолжения нажмите на любую клавишу.");
-              Console.ReadKey();
-              continue;
+              ErrorOutput(ex);
+              WaitForUserInput();
             }
             break;
 
           // Создать отчет.
           case ConsoleKey.D7:
-            Report report = new Report(productService);
+            Report report = Report.Initialize(this.ProductService);
             report.CreateReport();
             break;
 
@@ -166,7 +173,6 @@ namespace FlowerShopResourceManagementSystem
     /// </summary>
     /// <param name="textMessage">Вывод сообщения, что надо ввести.</param>
     /// <returns>Возращает название товара введеное с консоли.</returns>
-    /// <exception cref="FormatException">Возникает, когда пользователь ввел пустую строку.</exception>
     string ReadName(string textMessage)
     {
       Console.Write(textMessage);
@@ -179,8 +185,7 @@ namespace FlowerShopResourceManagementSystem
     /// </summary>
     /// <param name="textMessage">Вывод сообщения, что надо ввести.</param>
     /// <returns>Возращает цену товара, введеную с консоли.</returns>
-    /// <exception cref="FormatException">Возникает, когда пользователь ввел пустую строку.</exception>
-    double ReadPrice(string textMessage = "Введите цену товара: ")
+    double ReadPrice(string textMessage)
     {
       Console.Write(textMessage);
       string inputPrice = ReadLineFromConsole();
@@ -192,7 +197,6 @@ namespace FlowerShopResourceManagementSystem
     /// </summary>
     /// <param name="textMessage">Вывод сообщения, что надо ввести.</param>
     /// <returns>Возращает количество товара, введеное с консоли.</returns>
-    /// <exception cref="FormatException">Возникает, когда пользователь ввел некорректное число.</exception>
     int ReadQuantity(string textMessage = "Введите количество товара: ")
     {
       Console.Write(textMessage);
@@ -208,8 +212,7 @@ namespace FlowerShopResourceManagementSystem
     /// Считывание строки.
     /// </summary>
     /// <returns>Введеную строку.</returns>
-    /// <exception cref="СreatingElementException">Вызывается когда пользователь нажимает клавишу esc.</exception>
-    string ReadLineFromConsole()
+    public string ReadLineFromConsole()
     {
       StringBuilder input = new StringBuilder();
       ConsoleKeyInfo key;
@@ -229,13 +232,45 @@ namespace FlowerShopResourceManagementSystem
         }
         else if (key.Key == ConsoleKey.Escape)
         {
-          throw new СreatingElementException();
+          StartProgram(); 
         }
       }
       while (key.Key != ConsoleKey.Enter);
       Console.WriteLine();
       return input.ToString();
     }
+
+    /// <summary>
+    /// Вывод сообщения ошибки.
+    /// </summary>
+    /// <param name="ex">Объект типа Exception.</param>
+    private void ErrorOutput(Exception ex)
+    {
+      Console.WriteLine(ex.Message);
+    }
+    
+    /// <summary>
+    /// Ожидание нажатия клавиши.
+    /// </summary>
+    private void WaitForUserInput()
+    {
+      Console.WriteLine("Для продолжения нажмите на любую клавишу.");
+      Console.ReadKey();
+    }
+
+    #endregion
+
+    #region Конструктор
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="productService">Экзмемпляр для работы с объектами Product.</param>
+    private ConsoleProgram(IProductService productService)
+    {
+      this.ProductService = productService;
+    }
+    
     #endregion
   }
 }
